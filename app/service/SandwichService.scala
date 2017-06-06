@@ -7,9 +7,6 @@ import uk.gov.hmrc.play.http.ws.WSGet
 
 import scala.concurrent.Future
 
-//default execution context https://www.playframework.com/documentation/2.5.x/ScalaAsync
-import play.api.libs.concurrent.Execution.Implicits.defaultContext
-
 class RealSandwichService extends SandwichService {
 
   val http = new WSGet {
