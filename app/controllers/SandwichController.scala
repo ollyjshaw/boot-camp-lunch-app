@@ -3,11 +3,16 @@ package controllers
 import javax.inject.Inject
 
 import play.api.mvc.{Action, Controller}
-import service.{GreetingService, SandwichService}
+import service.SandwichService
 
-class SandwichController @Inject()(sandwichService: SandwichService) extends Controller{
-  def sandwiches() = Action {
+//default execution context https://www.playframework.com/documentation/2.5.x/ScalaAsync
+import play.api.libs.concurrent.Execution.Implicits.defaultContext
+
+class SandwichController @Inject()(sandwichService: SandwichService) extends Controller {
+  def sandwiches() = Action.async {
     val sandwiches = sandwichService.sandwiches()
-    Ok(views.html.sandwiches(sandwiches))
+    sandwiches.map{ listOfSarnies =>
+      Ok(views.html.sandwiches(listOfSarnies))
+    }
   }
 }
