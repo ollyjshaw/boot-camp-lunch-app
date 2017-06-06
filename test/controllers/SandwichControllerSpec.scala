@@ -3,9 +3,11 @@ package controllers
 import models.Sandwich
 import org.scalatestplus.play._
 import org.scalatestplus.play.guice.GuiceOneAppPerTest
+import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{status, _}
 import service.SandwichService
+import play.api.inject.bind
 
 //default execution context https://www.playframework.com/documentation/2.5.x/ScalaAsync
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
@@ -15,9 +17,14 @@ import scala.concurrent.Future
 class SandwichControllerSpec extends PlaySpec with GuiceOneAppPerTest {
   "SandwichController" should {
     "Have some basic information and be accessible at the correct route" in {
+
+      val application = new GuiceApplicationBuilder().
+        overrides(bind[SandwichService].to[IntegrationSandwichService]).
+        build
+
       // Need to specify Host header to get through AllowedHostsFilter
       val request = FakeRequest(GET, "/sandwiches").withHeaders("Host" -> "localhost")
-      val home = route(app, request).get
+      val home = route(application, request).get
 
       //sanitation
       status(home) mustBe OK
@@ -60,6 +67,9 @@ class SandwichControllerSpec extends PlaySpec with GuiceOneAppPerTest {
   }
 }
 
+class IntegrationSandwichService extends SandwichService {
+  override def sandwiches(): Future[List[Sandwich]] = Future(List())
+}
 object FakeNoSandwichService extends SandwichService {
   override def sandwiches(): Future[List[Sandwich]] = Future(List())
 }
