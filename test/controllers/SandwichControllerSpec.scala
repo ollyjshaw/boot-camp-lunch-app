@@ -7,6 +7,11 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.{status, _}
 import service.SandwichService
 
+//default execution context https://www.playframework.com/documentation/2.5.x/ScalaAsync
+import play.api.libs.concurrent.Execution.Implicits.defaultContext
+
+import scala.concurrent.Future
+
 class SandwichControllerSpec extends PlaySpec with GuiceOneAppPerTest {
   "SandwichController" should {
     "Have some basic information and be accessible at the correct route" in {
@@ -56,16 +61,16 @@ class SandwichControllerSpec extends PlaySpec with GuiceOneAppPerTest {
 }
 
 object FakeNoSandwichService extends SandwichService {
-  override def sandwiches(): List[Sandwich] = List()
+  override def sandwiches(): Future[List[Sandwich]] = Future(List())
 }
 
 object FakeSingleSandwichService extends SandwichService {
-  override def sandwiches(): List[Sandwich] = List(Sandwich("Ham", 1.55, "Very tasty"))
+  override def sandwiches(): Future[List[Sandwich]] = Future(List(Sandwich("Ham", 1.55, "Very tasty")))
 }
 
 object FakeMultiSandwichService extends SandwichService {
   val ham = Sandwich("Ham", 1.55, "Very tasty")
   val cheese = Sandwich("Cheese", 2.55, "Cheese tastic")
   val egg = Sandwich("Egg", 1.15, "Fresh")
-  override def sandwiches(): List[Sandwich] = List(ham, cheese, egg)
+  override def sandwiches(): Future[List[Sandwich]] = Future(List(ham, cheese, egg))
 }
